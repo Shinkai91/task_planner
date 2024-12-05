@@ -60,6 +60,18 @@ class _HomeScreenState extends State<HomeScreen> {
         "Tasks saved locally: $tasksJson"); // Debugging: Melihat data yang disimpan
   }
 
+  // Fungsi untuk menangani perubahan urutan tugas
+  void onReorder(int oldIndex, int newIndex) {
+    setState(() {
+      if (newIndex > oldIndex) {
+        newIndex -= 1;
+      }
+      final Task task = tasks.removeAt(oldIndex);
+      tasks.insert(newIndex, task);
+    });
+    saveTasks();
+  }
+
   @override
   Widget build(BuildContext context) {
     return Scaffold(
@@ -85,73 +97,79 @@ class _HomeScreenState extends State<HomeScreen> {
           ? const Center(
               child: Text('No tasks yet! Add a task using the "+" button.'),
             )
-          : ListView.builder(
-              itemCount: tasks.length,
-              itemBuilder: (context, index) {
-                return Card(
-                  margin: const EdgeInsets.symmetric(vertical: 8.0, horizontal: 14.0),
-                  elevation: 4,
-                  shape: RoundedRectangleBorder(
-                    borderRadius: BorderRadius.circular(15),
-                  ),
-                  child: ListTile(
-                    contentPadding: const EdgeInsets.all(16),
-                    title: Text(
-                      tasks[index].title,
-                      style: const TextStyle(
-                          fontSize: 18, fontWeight: FontWeight.bold),
+          : ReorderableListView(
+              onReorder: onReorder, // Menangani perubahan urutan
+              children: List.generate(
+                tasks.length,
+                (index) {
+                  return Card(
+                    key: ValueKey(tasks[index]
+                        .title), // Memastikan setiap kartu memiliki key unik
+                    margin: const EdgeInsets.symmetric(
+                        vertical: 8.0, horizontal: 14.0),
+                    elevation: 4,
+                    shape: RoundedRectangleBorder(
+                      borderRadius: BorderRadius.circular(15),
                     ),
-                    subtitle: Column(
-                      crossAxisAlignment: CrossAxisAlignment.start,
-                      children: [
-                        Text(tasks[index].description,
-                            style: const TextStyle(fontSize: 14)),
-                        if (tasks[index].startTime != null)
-                          Text(
-                            'Date & Time: ${DateFormat('yyyy-MM-dd – hh:mm a').format(tasks[index].startTime!)}',
-                            style: const TextStyle(
-                                fontSize: 14, color: Colors.grey),
-                          ),
-                      ],
-                    ),
-                    trailing: Row(
-                      mainAxisSize: MainAxisSize.min,
-                      children: [
-                        IconButton(
-                          icon: const Icon(Icons.edit, color: Colors.orange),
-                          onPressed: () {
-                            Navigator.push(
-                              context,
-                              MaterialPageRoute(
-                                builder: (context) => TaskScreen(
-                                  addTask: addTask,
-                                  task: tasks[index],
-                                  isEditing: true,
-                                  onSave: (editedTask) {
-                                    setState(() {
-                                      tasks[index] = editedTask;
-                                    });
-                                    saveTasks();
-                                  },
+                    child: ListTile(
+                      contentPadding: const EdgeInsets.all(16),
+                      title: Text(
+                        tasks[index].title,
+                        style: const TextStyle(
+                            fontSize: 18, fontWeight: FontWeight.bold),
+                      ),
+                      subtitle: Column(
+                        crossAxisAlignment: CrossAxisAlignment.start,
+                        children: [
+                          Text(tasks[index].description,
+                              style: const TextStyle(fontSize: 14)),
+                          if (tasks[index].startTime != null)
+                            Text(
+                              'Date & Time: ${DateFormat('yyyy-MM-dd – hh:mm a').format(tasks[index].startTime!)}',
+                              style: const TextStyle(
+                                  fontSize: 14, color: Colors.grey),
+                            ),
+                        ],
+                      ),
+                      trailing: Row(
+                        mainAxisSize: MainAxisSize.min,
+                        children: [
+                          IconButton(
+                            icon: const Icon(Icons.edit, color: Colors.orange),
+                            onPressed: () {
+                              Navigator.push(
+                                context,
+                                MaterialPageRoute(
+                                  builder: (context) => TaskScreen(
+                                    addTask: addTask,
+                                    task: tasks[index],
+                                    isEditing: true,
+                                    onSave: (editedTask) {
+                                      setState(() {
+                                        tasks[index] = editedTask;
+                                      });
+                                      saveTasks();
+                                    },
+                                  ),
                                 ),
-                              ),
-                            );
-                          },
-                        ),
-                        IconButton(
-                          icon: const Icon(Icons.delete, color: Colors.red),
-                          onPressed: () {
-                            setState(() {
-                              tasks.removeAt(index);
-                            });
-                            saveTasks();
-                          },
-                        ),
-                      ],
+                              );
+                            },
+                          ),
+                          IconButton(
+                            icon: const Icon(Icons.delete, color: Colors.red),
+                            onPressed: () {
+                              setState(() {
+                                tasks.removeAt(index);
+                              });
+                              saveTasks();
+                            },
+                          ),
+                        ],
+                      ),
                     ),
-                  ),
-                );
-              },
+                  );
+                },
+              ),
             ),
       floatingActionButton: FloatingActionButton(
         onPressed: () {

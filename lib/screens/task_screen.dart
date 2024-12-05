@@ -88,6 +88,7 @@ class _TaskScreenState extends State<TaskScreen> {
 
     if (selectedDate != null) {
       final TimeOfDay? selectedTime = await showTimePicker(
+        // ignore: use_build_context_synchronously
         context: context,
         initialTime: TimeOfDay.fromDateTime(startTime ?? DateTime.now()),
       );
@@ -113,6 +114,7 @@ class _TaskScreenState extends State<TaskScreen> {
       final difference = task.startTime!.difference(now).inMinutes;
 
       // Debugging log for checking the time difference
+      // ignore: avoid_print
       print('Time difference: $difference minutes');
 
       // Schedule notification if the task is 10 minutes or less away
