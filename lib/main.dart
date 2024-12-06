@@ -1,5 +1,5 @@
 import 'package:flutter/material.dart';
-import 'package:task_planner/screens/home_screen.dart';
+import 'package:task_planner/screens/splash_screen.dart';
 import 'package:timezone/data/latest.dart' as tz;
 
 void main() {
@@ -17,7 +17,7 @@ class MyApp extends StatelessWidget {
       theme: ThemeData(
         primarySwatch: Colors.teal,
       ),
-      home: const HomeScreen(),
+      home: const SplashScreen(),
     );
   }
 }
